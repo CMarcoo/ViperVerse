@@ -1,0 +1,12 @@
+name: ViperVerse
+version: ${project.version}
+main: me.thevipershow.viperverse.ViperVerse
+authors: [ TheViperShow ]
+description: Manage your worlds with ViperVerse.
+website: https://github.com/TheViperShow/
+commands:
+  vv:
+    description: "§aManage your worlds using ViperVerse"
+    aliases:
+      - "viperverse"
+    permission-message: "§aYou are missing required permissions."
