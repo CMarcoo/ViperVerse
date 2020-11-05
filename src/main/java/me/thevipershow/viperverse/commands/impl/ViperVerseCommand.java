@@ -11,15 +11,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.Plugin;
+import static me.thevipershow.viperverse.commands.Utils.colour;
 
 public final class ViperVerseCommand implements CommandExecutor, TabCompleter {
 
     private final Plugin plugin;
 
     private final static List<String> immutableFirstArgs = Collections.unmodifiableList(Lists.newArrayList(
-            "list","tp", "unload", "delete", "move-all"));
+            "list","tp", "unload", "delete", "move-all", "load"));
 
-    public ViperVerseCommand(Plugin plugin) {
+    public ViperVerseCommand(final Plugin plugin) {
         this.plugin = plugin;
         final Server srv = plugin.getServer();
         final PluginCommand pluginCommand = srv.getPluginCommand("vv");
@@ -27,8 +28,27 @@ public final class ViperVerseCommand implements CommandExecutor, TabCompleter {
         pluginCommand.setTabCompleter(this);
     }
 
+    private static void sendHelp(final CommandSender sender) {
+        sender.sendMessage(colour("§aViperVerse's Help Page§7:")); // │ ├
+        sender.sendMessage(colour("§7  │"));
+        sender.sendMessage(colour("§7  ├─ §8[§avv tp §7<§2w§7>§8]"));
+        sender.sendMessage(colour("§7  │  §o§fUsed to teleport yourself to a world."));
+        sender.sendMessage(colour("§7  │"));
+        sender.sendMessage(colour("§7  ├─ §8[§avv unload §7<§2w§7>§8]"));
+        sender.sendMessage(colour("§7  │  §o§fUsed to unload a loaded world."));
+        sender.sendMessage(colour("§7  │"));
+        sender.sendMessage(colour("§7  ├─ §8[§avv delete §7<§2w§7>§8]"));
+        sender.sendMessage(colour("§7  │  §o§fUsed to delete a world §r§7(§4§lIRREVERSIBLE!§r§7)"));
+        sender.sendMessage(colour("§7  │"));
+        sender.sendMessage(colour("§7  ├─ §8[§avv move-all §7<§2w§7>§8]"));
+        sender.sendMessage(colour("§7  │  §o§fUsed to teleport everyone to a world."));
+        sender.sendMessage(colour("§7  │"));
+        sender.sendMessage(colour("§7  ├─ §8[§avv load §7<§2w§7>§8]"));
+        sender.sendMessage(colour("§7  │  §o§fUsed to load a world in the server folder."));
+    }
+
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
+    public boolean onCommand(final CommandSender sender, final Command command, final String alias, final String[] args) {
         if (args.length > 0) {
             switch (args[0]) {
                 case "tp":
@@ -46,26 +66,31 @@ public final class ViperVerseCommand implements CommandExecutor, TabCompleter {
                 case "list":
                     new CommandList(args, sender, this.plugin).perform();
                     break;
+                case "load":
+                    new CommandLoad(args, sender, this.plugin).perform();
+                    break;
                 default:
                     break;
             }
+        } else {
+            sendHelp(sender);
         }
         return true;
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length == 1)
+        if (args.length == 1) {
             return immutableFirstArgs;
-
-        if (args.length == 2) {
+        } else if (args.length == 2) {
             switch (args[0].toLowerCase()) {
                 case "tp":
                 case "unload":
                 case "delete":
+                case "load":
                 case "move-all":
                 case "list":
-                    return WorldUtils.getLoadedWorldNames();
+                    return WorldUtils.getPossibleWorldDirectories(plugin.getServer());
                 default:
                     return null;
             }

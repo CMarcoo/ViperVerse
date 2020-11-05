@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.Optional;
 import me.thevipershow.viperverse.WorldUtils;
 import me.thevipershow.viperverse.commands.CommandNode;
+import me.thevipershow.viperverse.commands.Utils;
 import me.thevipershow.viperverse.commands.api.AsyncWorldDeleteEvent;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -19,7 +20,7 @@ public class CommandDelete extends CommandNode {
     private final Plugin plugin;
 
     public CommandDelete(String[] args, CommandSender commandSender, Plugin plugin) {
-        super(args, commandSender, 2, Player.class, ConsoleCommandSender.class);
+        super(args, commandSender, 2, "viperverse.admin.delete", Player.class, ConsoleCommandSender.class);
         this.plugin = plugin;
     }
 
@@ -31,10 +32,10 @@ public class CommandDelete extends CommandNode {
             final World targetWorld = searchedWorld.get();
             final World lobbyWorld = plugin.getServer().getWorlds().get(0);
 
-            commandSender.sendMessage(prefix + "§aStarting the unloading. . .");
+            commandSender.sendMessage(prefix + Utils.colour("§aStarting the unloading. . ."));
 
             if (lobbyWorld == null) {
-                commandSender.sendMessage(prefix + "§cERROR: something went wrong when searching for a default server.");
+                commandSender.sendMessage(prefix + Utils.colour("§cERROR: something went wrong when searching for a default server."));
                 return;
             }
 
@@ -44,9 +45,9 @@ public class CommandDelete extends CommandNode {
 
             plugin.getServer().unloadWorld(targetWorld, true);
 
-            commandSender.sendMessage(prefix + String.format("§aWorld \"§2%s§a\" has been unloaded in %d ms", worldName, now() - milliStart));
+            commandSender.sendMessage(prefix + Utils.colour(String.format("§aWorld \"§2%s§a\" has been unloaded in %d ms", worldName, now() - milliStart)));
 
-            commandSender.sendMessage(prefix + "§aStarting deletion. . .");
+            commandSender.sendMessage(prefix + Utils.colour("§aStarting deletion. . ."));
 
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
                 final long deleteStart = now();
@@ -61,16 +62,16 @@ public class CommandDelete extends CommandNode {
                             .sorted(Comparator.reverseOrder())
                             .map(Path::toFile)
                             .forEach(File::delete);
-                    commandSender.sendMessage(prefix + String.format("§a\"§2%s§a\"'s world folder has been delete asynchronously in %d ms",
+                    commandSender.sendMessage(prefix + Utils.colour(String.format("§a\"§2%s§a\"'s world folder has been delete asynchronously in %d ms",
                             worldName,
-                            now() - milliStart));
+                            now() - milliStart)));
                 } catch (final IOException e) {
-                    commandSender.sendMessage(prefix + "§cERROR: World deletion has failed, check logs.");
+                    commandSender.sendMessage(prefix + Utils.colour("§cERROR: World deletion has failed, check logs."));
                     e.printStackTrace();
                 }
             });
         } else {
-            commandSender.sendMessage(prefix + String.format("§aA world named \"§2%s§a\" does not exist.", worldName));
+            commandSender.sendMessage(prefix + Utils.colour(String.format("§aA world named \"§2%s§a\" does not exist.", worldName)));
         }
     }
 }

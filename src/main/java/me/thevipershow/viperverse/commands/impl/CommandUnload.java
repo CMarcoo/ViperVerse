@@ -3,6 +3,7 @@ package me.thevipershow.viperverse.commands.impl;
 import java.util.Optional;
 import me.thevipershow.viperverse.WorldUtils;
 import me.thevipershow.viperverse.commands.CommandNode;
+import me.thevipershow.viperverse.commands.Utils;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -13,7 +14,7 @@ public class CommandUnload extends CommandNode {
     private final Plugin plugin;
 
     protected CommandUnload(String[] args, CommandSender commandSender, Plugin plugin) {
-        super(args, commandSender, 2, Player.class, ConsoleCommandSender.class);
+        super(args, commandSender, 2, "viperverse.admin.unload", Player.class, ConsoleCommandSender.class);
         this.plugin = plugin;
     }
 
@@ -25,10 +26,10 @@ public class CommandUnload extends CommandNode {
             final World targetWorld = searchedWorld.get();
             final World lobbyWorld = plugin.getServer().getWorlds().get(0);
 
-            commandSender.sendMessage(prefix + "§aStarting the unloading. . .");
+            commandSender.sendMessage(prefix + Utils.colour("§aStarting the unloading. . ."));
 
             if (lobbyWorld == null) {
-                commandSender.sendMessage(prefix + "§cERROR: something went wrong when searching for a default server.");
+                commandSender.sendMessage(prefix + Utils.colour("§cERROR: something went wrong when searching for a default server."));
                 return;
             }
 
@@ -38,9 +39,9 @@ public class CommandUnload extends CommandNode {
 
             plugin.getServer().unloadWorld(targetWorld, true);
 
-            commandSender.sendMessage(prefix + String.format("§aWorld \"§2%s§a\" has been unloaded in %d ms", worldName, now() - milliStart));
+            commandSender.sendMessage(prefix + Utils.colour(String.format("§aWorld \"§2%s§a\" has been unloaded in %d ms", worldName, now() - milliStart)));
         } else {
-            commandSender.sendMessage(prefix + String.format("§aA world named \"§2%s§a\" does not exist.", worldName));
+            commandSender.sendMessage(prefix + Utils.colour(String.format("§aA world named \"§2%s§a\" does not exist.", worldName)));
         }
     }
 }

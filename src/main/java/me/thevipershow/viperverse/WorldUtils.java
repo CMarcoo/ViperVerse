@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
@@ -68,8 +69,7 @@ public final class WorldUtils {
                             certain += 35.0;
                             break;
                     }
-                } catch (IndexOutOfBoundsException e) {
-                }
+                } catch (IndexOutOfBoundsException ignored) { }
             }
         }
         return certain >= 100.00;
@@ -78,9 +78,11 @@ public final class WorldUtils {
 
     public static List<String> getPossibleWorldDirectories(final Server server) {
         final List<String> fList = new ArrayList<>();
-        for (final File file : server.getWorldContainer().listFiles())
-            if (isDefinetivelyABukkitWorldFolder(file))
+        for (final File file : Objects.requireNonNull(server.getWorldContainer().listFiles())) {
+            if (isDefinetivelyABukkitWorldFolder(file)) {
                 fList.add(file.getName());
+            }
+        }
 
         return Collections.unmodifiableList(fList);
     }

@@ -1,17 +1,19 @@
 package me.thevipershow.viperverse.commands;
 
 import org.bukkit.command.CommandSender;
+import static me.thevipershow.viperverse.commands.Utils.colour;
 
 public abstract class CommandNode {
-    public static final String prefix = "§7[§aViperVerse§7]: ";
+    public static final String prefix = colour("§7[§aViperVerse§7]: ");
     protected final String[] args;
     protected final CommandSender commandSender;
     protected final int desiredLength;
     protected final String wrongArgsMessage;
     protected final Class<? extends CommandSender>[] desiredSender;
     protected final String wrongCommandSenderMessage;
+    protected final String nodePerm;
 
-    private final String getAllowedSenderString() {
+    private String getAllowedSenderString() {
         final StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < desiredSender.length; i++) {
             stringBuilder.append(desiredSender[i].getName());
@@ -26,19 +28,28 @@ public abstract class CommandNode {
             String[] args,
             CommandSender commandSender,
             int desiredLength,
-            Class<? extends CommandSender>... desiredSender) {
+            String nodePerm, Class<? extends CommandSender>... desiredSender) {
         this.args = args;
         this.commandSender = commandSender;
         this.desiredLength = desiredLength;
-        this.wrongArgsMessage = prefix + "§athe number of arguments must be §2" + desiredLength;
+        this.wrongArgsMessage = colour( prefix + "§athe number of arguments must be §2" + desiredLength);
+        this.nodePerm = nodePerm;
         this.desiredSender = desiredSender;
-        this.wrongCommandSenderMessage = prefix + "§aYou must be a §2" + getAllowedSenderString() + " §ato execute this command.";
+        this.wrongCommandSenderMessage = colour( prefix + "§aYou must be a §2" + getAllowedSenderString() + " §ato execute this command.");
     }
 
     protected abstract void logic();
 
     protected static long now() {
         return System.currentTimeMillis();
+    }
+
+    private static boolean checkForPermission(final CommandSender commandSender, final String permission) {
+        if (!commandSender.hasPermission(permission)) {
+            commandSender.sendMessage(colour(prefix + "§cMissing permissions to do this."));
+            return false;
+        }
+        return true;
     }
 
     public void perform() {
@@ -58,8 +69,6 @@ public abstract class CommandNode {
 
         closed = closed && !foundNone;
 
-        if (!closed) {
-           logic();
-        }
+        if (!closed && checkForPermission(this.commandSender, this.nodePerm)) logic();
     }
 }
